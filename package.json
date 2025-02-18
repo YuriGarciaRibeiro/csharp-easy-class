@@ -1,7 +1,7 @@
 {
   "name": "csharp-easy-class",
-  "displayName": "c# easy class",
-  "description": "",
+  "displayName": "C# Easy Class",
+  "description": "Paste a class from clipboard",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.97.0"
@@ -12,12 +12,24 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "csharp-easy-class.pasteClass",
+          "group": "navigation"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "csharp-easy-class.helloWorld",
-        "title": "Hello World"
+        "command": "csharp-easy-class.pasteClass",
+        "title": "Paste Class from Clipboard"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YuriGarciaRibeiro/csharp-easy-class.git"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

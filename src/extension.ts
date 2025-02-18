@@ -1,26 +1,34 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const classRegex = /^\s*(?:(?:public|private|internal|protected)\s+)?(?:(?:abstract|sealed|static|readonly|partial)\s+)?(?:class|interface|record|struct|enum)\s+\w+\s*(?:<\s*\w+(?:\s*,\s*\w+)*\s*>)?\s*(?::\s*\w+(?:\s*,\s*\w+)*)?\s*(?:where\s+\w+\s*:\s*\w+(?:\s*,\s*\w+)*)?\s*[{\;]/;
+
 export function activate(context: vscode.ExtensionContext) {
+  let disposable = vscode.commands.registerCommand('csharp-easy-class.pasteClass', async (uri: vscode.Uri) => {
+    const clipboardText = await vscode.env.clipboard.readText();
+    const match = clipboardText.match(classRegex);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "csharp-easy-class" is now active!');
+    if (!match) {
+      vscode.window.showInformationMessage('O conteúdo da área de transferência não é uma classe C# válida.');
+      return;
+    }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('csharp-easy-class.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from c# easy class!');
-	});
+    const classNameMatch = clipboardText.match(/(?:class|interface|record|struct|enum)\s+(\w+)/);
+    if (!classNameMatch) {
+      vscode.window.showInformationMessage('Não foi possível encontrar o nome da classe no conteúdo da área de transferência.');
+      return;
+    }
+    const className = classNameMatch[1];
+    const filePath = path.join(uri.fsPath, `${className}.cs`);
 
-	context.subscriptions.push(disposable);
+    fs.writeFileSync(filePath, clipboardText);
+
+    const document = await vscode.workspace.openTextDocument(filePath);
+    await vscode.window.showTextDocument(document);
+  });
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
