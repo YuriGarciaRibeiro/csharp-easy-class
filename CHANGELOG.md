@@ -4,6 +4,12 @@ All notable changes to the "csharp-easy-class" extension will be documented in t
 
 This project follows the recommendations of [Keep a Changelog](http://keepachangelog.com/).
 
+## [0.0.3] - 2025-02-19
+
+### Added
+- Automatic namespace creation based on folder structure starting from the `.csproj` file location.
+- Context menu now only appears when right-clicking on a folder in the Explorer.
+
 ## [0.0.2] - 2025-02-19
 
 ### Added

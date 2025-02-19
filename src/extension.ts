@@ -1,35 +1,39 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
+import { Utils } from './utils';
 
-const classRegex = /^\s*(?:(?:public|private|internal|protected)\s+)?(?:(?:abstract|sealed|static|readonly|partial)\s+)?(?:class|interface|record|struct|enum)\s+\w+\s*(?:<\s*\w+(?:\s*,\s*\w+)*\s*>)?\s*(?::\s*\w+(?:\s*,\s*\w+)*)?\s*(?:where\s+\w+\s*:\s*\w+(?:\s*,\s*\w+)*)?\s*[{\;]/;
-
+// Função principal de ativação
 export function activate(context: vscode.ExtensionContext) {
-	let disposable = vscode.commands.registerCommand('csharp-easy-class.pasteClass', async (uri: vscode.Uri) => {
-		const clipboardText = await vscode.env.clipboard.readText();
-		const match = clipboardText.match(classRegex);
+    let disposable = vscode.commands.registerCommand('csharp-easy-class.pasteClass', async (uri: vscode.Uri) => {
+        const clipboardText = await Utils.readClipboardText();
+        const className = Utils.extractClassName(clipboardText);
+        if (!className) {
+            vscode.window.showInformationMessage('Clipboard does not contain a valid C# class.');
+            return;
+        }
 
-		if (!match) {
-			vscode.window.showInformationMessage('Clipboard does not contain a C# struct.');
-			return;
-		}
+        const workspacePath = vscode.workspace.getWorkspaceFolder(uri)?.uri.fsPath;
+        if (!workspacePath) {
+            vscode.window.showInformationMessage('No workspace found.');
+            return;
+        }
 
-		const classNameMatch = clipboardText.match(/(?:class|interface|record|struct|enum)\s+(\w+)/);
-		if (!classNameMatch) {
-			vscode.window.showInformationMessage('Clipboard does not contain a struct name.');
-			return;
-		}
+        var namespace = '';
 
-		const className = classNameMatch[1];
-		const filePath = path.join(uri.fsPath, `${className}.cs`);
-		
-		fs.writeFileSync(filePath, clipboardText);
+        if(!Utils.verifyNamespace(clipboardText)) {
+            namespace = Utils.generateNamespaceFromCsproj(uri.fsPath); 
+        }
 
-		const document = await vscode.workspace.openTextDocument(filePath);
-		await vscode.window.showTextDocument(document);
-  	});
+        const filePath = path.join(uri.fsPath, `${className}.cs`);
 
-  context.subscriptions.push(disposable);
+        const fileContent = Utils.createFileContent(namespace, clipboardText);
+        Utils.writeFile(filePath, fileContent);
+        
+        const document = await vscode.workspace.openTextDocument(filePath);
+        await vscode.window.showTextDocument(document);
+    });
+
+    context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}

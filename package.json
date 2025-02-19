@@ -3,7 +3,7 @@
   "displayName": "C# Easy Class",
   "description": "Paste a class from clipboard",
   "publisher": "YuriGarcia",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "assets/icon.jpeg",
   "engines": {
     "vscode": "^1.97.0"
@@ -18,6 +18,7 @@
       "explorer/context": [
         {
           "command": "csharp-easy-class.pasteClass",
+          "when": "explorerResourceIsFolder",
           "group": "navigation"
         }
       ]
