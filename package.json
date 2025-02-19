@@ -2,7 +2,9 @@
   "name": "csharp-easy-class",
   "displayName": "C# Easy Class",
   "description": "Paste a class from clipboard",
-  "version": "0.0.1",
+  "publisher": "YuriGarcia",
+  "version": "0.0.2",
+  "icon": "assets/icon.jpeg",
   "engines": {
     "vscode": "^1.97.0"
   },
@@ -23,7 +25,7 @@
     "commands": [
       {
         "command": "csharp-easy-class.pasteClass",
-        "title": "Paste Class from Clipboard"
+        "title": "Paste struct from Clipboard"
       }
     ]
   },
